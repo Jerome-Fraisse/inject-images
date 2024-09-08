@@ -1,0 +1,36 @@
+/* Fichier de style pour Inject Images */
+
+.wrap {
+    background-color: #f0f8ff;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+p.description {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    padding: 9px 0 4px;
+    line-height: 1.3;
+}
+
+.custom-file-input {
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+}
+
+.custom-submit-btn {
+    background-color: #0073aa;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.custom-submit-btn:hover {
+    background-color: #005982;
+}

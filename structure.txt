@@ -1,0 +1,7 @@
+inject-images/
+├── inject-images.php
+├── admin/
+│   └── settings.php
+├── css/
+│   └── style.css
+├── images/ (à créer manuellement)
