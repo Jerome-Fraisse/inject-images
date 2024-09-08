@@ -21,5 +21,5 @@ Vous pouvez utiliser le shortcode suivant pour insérer une image aléatoire dan
 
 [inject_images]
 
-##Configuration supplémentaire
+## Configuration supplémentaire
 Si vous avez besoin de configurer ou d'ajuster le plugin, pour une customisation sur mesure vous pouvez diretement me contacter

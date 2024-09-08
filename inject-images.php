@@ -12,6 +12,9 @@ Requires PHP: 7.2
 Requires at least: 5.0
 Tested up to: 6.0
 */
+if (!defined('ABSPATH')) {
+    exit;
+}
 // Inclure le fichier settings.php
 require_once plugin_dir_path(__FILE__) . 'admin/settings.php';
 
