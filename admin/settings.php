@@ -1,31 +1,94 @@
 <?php
 // Affichage de la page d'options
-function inject_images_dashboard_page()
+function inject_images_settings_page()
 {
+    // Vérification et création des répertoires si nécessaire
+    $stockDir = plugin_dir_path(__FILE__) . '../stock-images/';
+    $usedDir = plugin_dir_path(__FILE__) . '../images-utilisees/';
+
+    if (!file_exists($stockDir)) {
+        mkdir($stockDir, 0755, true);
+    }
+
+    if (!file_exists($usedDir)) {
+        mkdir($usedDir, 0755, true);
+    }
+
+    // Obtenir l'URL du répertoire stock-images et images-utilisees
+    $stockImagesUrl = site_url() . '/wp-content/plugins/inject-images/stock-images/';
+    $usedImagesUrl = site_url() . '/wp-content/plugins/inject-images/images-utilisees/';
+
 ?>
-    <div class="wrap">
+    <div class="wrap_tool">
         <h1>Paramètres du plugin Inject Images</h1>
-        <form method="post" enctype="multipart/form-data" action="">
+
+        <!-- Formulaire pour téléverser des images dans "stock-images" -->
+        <form method="post" enctype="multipart/form-data" action="" id="uploadForm">
             <table class="form-table">
                 <tr>
                     <th scope="row"><label for="inject_images_images">Téléverser des images</label></th>
                     <td>
                         <input type="file" name="inject_images_images[]" id="inject_images_images" class="custom-file-input" multiple />
-                        <p class="description">Sélectionnez plusieurs images à télécharger dans le répertoire d'images.</p>
+                        <p class="description">Sélectionnez plusieurs images à télécharger dans le répertoire "stock-images".</p>
                     </td>
                 </tr>
             </table>
             <button type="submit" name="submit" class="custom-submit-btn">Téléverser</button>
         </form>
+
+        <!-- Script pour recharger la page après l'upload -->
+        <script type="text/javascript">
+            document.getElementById('uploadForm').onsubmit = function() {
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1000); // Recharger la page après 1 seconde
+            };
+        </script>
+
+        <!-- Aperçu des images dans "stock-images" -->
+        <h2>Images disponibles (stock-images)</h2>
+        <div style="display: flex; flex-wrap: wrap;">
+            <?php
+            // Récupérer toutes les images du répertoire "stock-images"
+            $images = glob($stockDir . "*.{jpg,jpeg,png,gif}", GLOB_BRACE);
+
+            if (empty($images)) {
+                echo '<p>Aucune image disponible.</p>';
+            } else {
+                foreach ($images as $image) {
+                    $imageUrl = $stockImagesUrl . basename($image);
+
+                    // Afficher l'image avec une taille uniforme de 160x120
+                    echo '<div style="margin: 10px; text-align: center;">';
+                    echo '<img src="' . esc_url($imageUrl) . '" alt="Image" style="width: 160px; height: 120px; display: block; margin-bottom: 5px;">';
+                    echo '</div>';
+                }
+            }
+            ?>
+        </div>
+
+        <!-- Aperçu des images dans "images-utilisees" -->
+        <h2>Images utilisées (images-utilisees)</h2>
+        <div style="display: flex; flex-wrap: wrap;">
+            <?php
+            // Récupérer toutes les images du répertoire "images-utilisees"
+            $usedImages = glob($usedDir . "*.{jpg,jpeg,png,gif}", GLOB_BRACE);
+
+            if (empty($usedImages)) {
+                echo '<p>Aucune image utilisée.</p>';
+            } else {
+                foreach ($usedImages as $usedImage) {
+                    $imageUrl = $usedImagesUrl . basename($usedImage);
+
+                    // Afficher l'image utilisée avec une taille uniforme de 160x120
+                    echo '<div style="margin: 10px; text-align: center;">';
+                    echo '<img src="' . esc_url($imageUrl) . '" alt="Image" style="width: 160px; height: 120px; display: block; margin-bottom: 5px;">';
+                    echo '</div>';
+                }
+            }
+            ?>
+        </div>
     </div>
-    <!-- Ajouter un espace pour le tutoriel -->
-    <h2>Tutoriel : Comment utiliser le plugin Inject Images</h2>
-    <p>Voici les étapes pour utiliser le plugin :</p>
-    <ol>
-        <li>Utilisez le formulaire ci-dessus pour téléverser plusieurs images.</li>
-        <li>Insérez le shortcode <code>[inject_images]</code> dans une page ou un article pour afficher une image aléatoire.</li>
-        <li>Le plugin va automatiquement sélectionner une image aléatoire depuis le répertoire et l'afficher.</li>
-    </ol>
 <?php
     // Traitement de l'upload d'image multiple
     if (isset($_FILES['inject_images_images']) && !empty($_FILES['inject_images_images']['name'][0])) {
@@ -33,49 +96,22 @@ function inject_images_dashboard_page()
     }
 }
 
-// Gérer le téléversement multiple d'images
+// Fonction pour gérer le téléchargement d'images multiples
 function inject_images_handle_multiple_images_upload()
 {
-    $uploaded_files = 0; // Compteur pour vérifier combien de fichiers ont été uploadés
+    // Chemin du répertoire stock-images
+    $stockDir = plugin_dir_path(__FILE__) . '../stock-images/';
 
-    foreach ($_FILES['inject_images_images']['tmp_name'] as $key => $tmp_name) {
-        if ($_FILES['inject_images_images']['error'][$key] === UPLOAD_ERR_OK) {
-            // Vérifier le type de fichier
-            $file_type = wp_check_filetype($_FILES['inject_images_images']['name'][$key]);
-            $allowed_types = array('jpg', 'jpeg', 'png', 'gif');
+    // Vérifier chaque fichier téléchargé
+    foreach ($_FILES['inject_images_images']['name'] as $key => $value) {
+        // Vérifier s'il y a une erreur de téléchargement
+        if ($_FILES['inject_images_images']['error'][$key] == UPLOAD_ERR_OK) {
+            $tmp_name = $_FILES['inject_images_images']['tmp_name'][$key];
+            $name = basename($_FILES['inject_images_images']['name'][$key]);
 
-            if (!in_array($file_type['ext'], $allowed_types)) {
-                echo '<div class="notice notice-error is-dismissible"><p>Type de fichier non autorisé pour le fichier ' . esc_html($_FILES['inject_images_images']['name'][$key]) . '. Veuillez téléverser une image JPG, PNG ou GIF.</p></div>';
-                continue;
-            }
-
-            // Chemin de destination dans un répertoire spécifique du plugin
-            $destination = plugin_dir_path(__FILE__) . '../images/';
-
-            // Créer le répertoire s'il n'existe pas
-            if (!file_exists($destination)) {
-                mkdir($destination, 0755, true);
-            }
-
-            // Obtenir le chemin du fichier téléversé
-            $file_tmp = $tmp_name;
-            $file_name = basename($_FILES['inject_images_images']['name'][$key]);
-            $file_path = $destination . $file_name;
-
-            // Déplacer le fichier vers le répertoire de destination
-            if (move_uploaded_file($file_tmp, $file_path)) {
-                $uploaded_files++;
-                echo '<div class="notice notice-success is-dismissible"><p>L\'image ' . esc_html($file_name) . ' a été téléchargée avec succès !</p></div>';
-            } else {
-                echo '<div class="notice notice-error is-dismissible"><p>Erreur lors du téléversement de l\'image ' . esc_html($file_name) . '.</p></div>';
-            }
-        } else {
-            echo '<div class="notice notice-error is-dismissible"><p>Erreur lors du téléchargement du fichier ' . esc_html($_FILES['inject_images_images']['name'][$key]) . '.</p></div>';
+            // Déplacer l'image téléchargée vers le répertoire stock-images
+            move_uploaded_file($tmp_name, $stockDir . $name);
         }
-    }
-
-    if ($uploaded_files === 0) {
-        echo '<div class="notice notice-warning is-dismissible"><p>Aucun fichier n\'a été téléversé.</p></div>';
     }
 }
 ?>
