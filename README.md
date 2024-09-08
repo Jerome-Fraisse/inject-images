@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./images/image.png" alt="Image locale">
+  <img src="./logo/logo-inject-image.jpg" alt="Image locale">
 </p>
 
 # Mode d'emploi du plugin Inject Images
