@@ -1,5 +1,6 @@
-![Image locale](./logo/logo-inject-image.jpg)
-
+<p align="center">
+  <img src="./images/image.png" alt="Image locale">
+</p>
 
 # Mode d'emploi du plugin Inject Images
 
